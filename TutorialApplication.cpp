@@ -86,6 +86,21 @@ bool TutorialApplication::processUnbufferedInput(const Ogre::FrameEvent& evt){
 bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
 	bool ret = BaseApplication::frameRenderingQueued(evt);
 	if(!processUnbufferedInput(evt)) return false;
+	ENetEvent event;
+	while(enet_host_service(client, &event, 1000) > 0){
+		switch(event.type){
+			case ENET_EVENT_TYPE_RECEIVE:
+				std::cout << "Packet Recieved, length: "
+					<< event.packet->dataLength 
+					<< " contains: " << event.packet->data
+					<< " receieved from: " << event.peer->data
+					<< " on channel: " << event.channelID << std::endl;
+
+				//Destroy packet after were done
+				enet_packet_destroy(event.packet);
+				break;
+		}
+	}
 	return ret;
 }
 
@@ -107,10 +122,12 @@ extern "C" {
 //#endif
     {
 		//Some enet stuff
+		if(enet_initialize() != 0){
+			std::cout << "An error occured while initializing Enet" << std::endl;
+		}
+		atexit(enet_deinitialize);
 		ENetAddress address;
 		ENetEvent event;
-		ENetHost *client;
-		client = enet_host_create(NULL,1,2,57600/8,14400/8);
 		std::string str_address;
 		std::cout << "Enter server IP: ";
 		std::cin >> str_address;
@@ -119,14 +136,16 @@ extern "C" {
 		address.port = 340;
         // Create application object
         TutorialApplication app;
-		app.peer = enet_host_connect(client, &address,2,0);
+		app.client = enet_host_create(NULL,1,2,57600/8,14400/8);
+		app.peer = enet_host_connect(app.client, &address,2,0);
+
 
 		if(app.peer == NULL){
 			std::cout << "No available peers for initiating an Enet Connection." << std::endl;
 			return EXIT_FAILURE;
 		}
 
-		if(enet_host_service(client, &event,5000) > 0 &&
+		if(enet_host_service(app.client, &event,5000) > 0 &&
 				event.type == ENET_EVENT_TYPE_CONNECT){
 
 			std::cout << "Connection to " << str_address << " was succesful" << std::endl;
