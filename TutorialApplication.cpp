@@ -51,7 +51,38 @@ void TutorialApplication::createScene(void){
 	light->setDiffuseColour(Ogre::ColourValue::White);
 	light->setSpecularColour(Ogre::ColourValue::White);
 
-	//create scene node
+}
+
+bool TutorialApplication::processUnbufferedInput(const Ogre::FrameEvent& evt){
+	static bool mMouseDown = false;
+	static Ogre::Real mToggle = 0.0;
+	static Ogre::Real mRotate = 0.13;
+	static Ogre::Real mMove = 250;
+
+	Ogre::Vector3 transVector = Ogre::Vector3::ZERO;
+
+	if(mKeyboard->isKeyDown(OIS::KC_I)){
+		transVector.z -= mMove;
+	}
+	if(mKeyboard->isKeyDown(OIS::KC_K)){
+		transVector.z += mMove;
+	}
+	if(mKeyboard->isKeyDown(OIS::KC_J)){
+		transVector.x -= mMove;
+	}
+	if(mKeyboard->isKeyDown(OIS::KC_L)){
+		transVector.x += mMove;
+	}
+
+	mSceneMgr->getSceneNode("player1")->translate(transVector * evt.timeSinceLastFrame, Ogre::Node::TS_LOCAL);
+
+	return true;
+}
+
+bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
+	bool ret = BaseApplication::frameRenderingQueued(evt);
+	if(!processUnbufferedInput(evt)) return false;
+	return ret;
 }
 
 
