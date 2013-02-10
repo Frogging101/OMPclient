@@ -100,14 +100,41 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
 extern "C" {
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
-#else
+//#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+//    INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+//#else
     int main(int argc, char *argv[])
-#endif
+//#endif
     {
+		//Some enet stuff
+		ENetAddress address;
+		ENetEvent event;
+		ENetHost *client;
+		client = enet_host_create(NULL,1,2,57600/8,14400/8);
+		std::string str_address;
+		std::cout << "Enter server IP: ";
+		std::cin >> str_address;
+		//setup host
+		enet_address_set_host(&address, str_address.c_str());
+		address.port = 340;
         // Create application object
         TutorialApplication app;
+		app.peer = enet_host_connect(client, &address,2,0);
+
+		if(app.peer == NULL){
+			std::cout << "No available peers for initiating an Enet Connection." << std::endl;
+			return EXIT_FAILURE;
+		}
+
+		if(enet_host_service(client, &event,5000) > 0 &&
+				event.type == ENET_EVENT_TYPE_CONNECT){
+
+			std::cout << "Connection to " << str_address << " was succesful" << std::endl;
+		}else {
+			enet_peer_reset(app.peer);
+			std::cout << "Connection to " << str_address << " failed" << std::endl;
+			return EXIT_FAILURE;
+		}
 
         try {
             app.go();

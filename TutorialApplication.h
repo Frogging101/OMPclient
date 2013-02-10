@@ -17,6 +17,7 @@ This source file is part of the
 #ifndef __TutorialApplication_h_
 #define __TutorialApplication_h_
 
+#include <enet/enet.h>
 #include "BaseApplication.h"
 
 class TutorialApplication : public BaseApplication
@@ -24,10 +25,12 @@ class TutorialApplication : public BaseApplication
 public:
     TutorialApplication(void);
     virtual ~TutorialApplication(void);
+	ENetPeer *peer;
 
 protected:
     virtual void createScene(void);
 	virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+
 private:
 	bool processUnbufferedInput(const Ogre::FrameEvent& evt);
 };
