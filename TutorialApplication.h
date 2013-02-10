@@ -27,6 +27,9 @@ public:
 
 protected:
     virtual void createScene(void);
+	virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+private:
+	bool processUnbufferedInput(const Ogre::FrameEvent& evt);
 };
 
 #endif // #ifndef __TutorialApplication_h_
