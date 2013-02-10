@@ -37,7 +37,7 @@ void TutorialApplication::createScene(void){
 	Ogre::SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode("player1");
 
 	//Create room
-	Ogre::Entity *cube = mSceneMgr->createEntity("cube",Ogre::SceneManager::PrefabType::PT_CUBE);
+	Ogre::Entity *cube = mSceneMgr->createEntity("cube","ogrehead.mesh");
 	Ogre::SceneNode *cubeNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("cube");
 
 	//Attach nodes
