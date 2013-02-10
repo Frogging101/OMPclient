@@ -88,20 +88,17 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
 	if(!processUnbufferedInput(evt)) return false;
 	ENetEvent event;
 	while(enet_host_service(client, &event, 1000) > 0){
-		switch(event.type){
-			case ENET_EVENT_TYPE_RECEIVE:
-				std::cout << "Packet Recieved, length: "
-					<< event.packet->dataLength 
-					<< " contains: " << event.packet->data
-					<< " receieved from: " << event.peer->data
-					<< " on channel: " << event.channelID << std::endl;
+		if(event.type == ENET_EVENT_TYPE_RECEIVE)
+			std::cout << "Packet Recieved, length: "
+				<< event.packet->dataLength 
+				<< " contains: " << event.packet->data
+				<< " receieved from: " << event.peer->data
+				<< " on channel: " << event.channelID << std::endl;
 
-				//Destroy packet after were done
-				enet_packet_destroy(event.packet);
-				break;
+			//Destroy packet after were done
+			enet_packet_destroy(event.packet);
+			break;
 		}
-	}
-	return ret;
 }
 
 
