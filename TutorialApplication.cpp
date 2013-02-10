@@ -36,7 +36,7 @@ void TutorialApplication::createScene(void){
 	Ogre::Entity *player1 = mSceneMgr->createEntity("player1","ninja.mesh");
 	Ogre::SceneNode *p1node = mSceneMgr->getRootSceneNode()->createChildSceneNode("player1");
 
-	Ogre::Entity *player2 = mSceneMgr->createEntity("player2","ninja.mesh");
+	Ogre::Entity *player2 = mSceneMgr->createEntity("player2","robot.mesh");
 	Ogre::SceneNode *p2node = mSceneMgr->getRootSceneNode()->createChildSceneNode("player2");
 
 	//Create room
