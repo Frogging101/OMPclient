@@ -34,14 +34,18 @@ void TutorialApplication::createScene(void){
 
 	//Create p1 entity
 	Ogre::Entity *player1 = mSceneMgr->createEntity("player1","ninja.mesh");
-	Ogre::SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode("player1");
+	Ogre::SceneNode *p1node = mSceneMgr->getRootSceneNode()->createChildSceneNode("player1");
+
+	Ogre::Entity *player2 = mSceneMgr->createEntity("player2","ninja.mesh");
+	Ogre::SceneNode *p2node = mSceneMgr->getRootSceneNode()->createChildSceneNode("player2");
 
 	//Create room
 	Ogre::Entity *cube = mSceneMgr->createEntity("cube","ogrehead.mesh");
 	Ogre::SceneNode *cubeNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("cube");
 
 	//Attach nodes
-	node->attachObject(player1);
+	p1node->attachObject(player1);
+	p2node->attachObject(player2);
 	cubeNode->attachObject(cube);
 
 	//Create light cause light is cool
