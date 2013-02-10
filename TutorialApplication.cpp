@@ -15,6 +15,7 @@ This source file is part of the
 -----------------------------------------------------------------------------
 */
 #include "TutorialApplication.h"
+#include <OgreSceneManager.h>
 
 //-------------------------------------------------------------------------------------
 TutorialApplication::TutorialApplication(void)
@@ -34,7 +35,14 @@ void TutorialApplication::createScene(void){
 	//Create p1 entity
 	Ogre::Entity *player1 = mSceneMgr->createEntity("player1","ninja.mesh");
 	Ogre::SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode("player1");
+
+	//Create room
+	Ogre::Entity *cube = mSceneMgr->createEntity("cube",Ogre::SceneManager::PrefabType::PT_CUBE);
+	Ogre::SceneNode *cubeNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("cube");
+
+	//Attach nodes
 	node->attachObject(player1);
+	cubeNode->attachObject(cube);
 
 	//Create light cause light is cool
 	Ogre::Light *light = mSceneMgr->createLight("Light1");
