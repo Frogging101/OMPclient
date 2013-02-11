@@ -29,7 +29,7 @@ Ogre::Vector3 packetToVect(std::string data){
 	//Ogre::Real x,y,z;
 	float x,y,z;
 	//ss.ignore();
-	char* bleh;
+	std::string bleh = "";
 	ss >> bleh >> x >> y >> z;
 	std::cout << x << " " << y << " " << z << std::endl;
 	return Ogre::Vector3(x,y,z);
@@ -119,7 +119,7 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
 	if(!processUnbufferedInput(evt)) return false;
 	ENetEvent event;
 	Ogre::Vector3 pos = mSceneMgr->getSceneNode("player1")->getPosition();
-	std::string packetData = "packet " + realToStr(pos.x) + " " + realToStr(pos.y) + " " + realToStr(pos.z); 
+	std::string packetData = "packet " + realToStr(pos.x) + " " + realToStr(pos.y) + " " + realToStr(pos.z);
 	ENetPacket *packet = enet_packet_create(packetData.c_str(),
 												strlen(packetData.c_str())+1,
 												ENET_PACKET_FLAG_RELIABLE);
