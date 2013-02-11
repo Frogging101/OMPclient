@@ -103,7 +103,6 @@ bool TutorialApplication::processUnbufferedInput(const Ogre::FrameEvent& evt){
 }
 
 bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
-	std::string player2Packet;
 	bool ret = BaseApplication::frameRenderingQueued(evt);
 	if(!processUnbufferedInput(evt)) return false;
 	ENetEvent event;
