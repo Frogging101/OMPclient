@@ -92,20 +92,19 @@ void handleNetwork(std::string ipAddress){
 				enet_packet_destroy(event.packet);
 				break;
 		}
-
-		enet_peer_disconnect(peer,0);
-		while(enet_host_service(client, &event, 3000) > 0){
-			switch(event.type){
-				case ENET_EVENT_TYPE_RECEIVE:
-					enet_packet_destroy(event.packet);
-					break;
-				case ENET_EVENT_TYPE_DISCONNECT:
-					std::cout << "Disconnected" << std::endl;
-					break;
-			}
+	}
+	enet_peer_disconnect(peer,0);
+	while(enet_host_service(client, &event, 3000) > 0){
+		switch(event.type){
+			case ENET_EVENT_TYPE_RECEIVE:
+				enet_packet_destroy(event.packet);
+				break;
+			case ENET_EVENT_TYPE_DISCONNECT:
+				std::cout << "Disconnected" << std::endl;
+				break;
 		}
 
-		enet_peer_reset(peer);
+	enet_peer_reset(peer);
 	}
 }
 
