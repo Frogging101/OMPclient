@@ -35,8 +35,7 @@ Ogre::Vector3 packetToVect(std::string data){
 	//Ogre::Real x,y,z;
 	float x,y,z;
 	//ss.ignore();
-	std::string bleh = "";
-	ss >> bleh >> x >> y >> z;
+	ss >> x >> y >> z;
 	std::cout << x << " " << y << " " << z << std::endl;
 	return Ogre::Vector3(x,y,z);
 }
@@ -70,7 +69,7 @@ void handleNetwork(std::string ipAddress){
 
 	while(!doShutdown){
 		//Ogre::Vector3 pos = app.mSceneMgr->getSceneNode("player1")->getPosition();
-		std::string packetData = "packet " + realToStr(p1Pos.x) + " " + realToStr(p1Pos.y) + " " + realToStr(p1Pos.z); 
+		std::string packetData = realToStr(p1Pos.x) + " " + realToStr(p1Pos.y) + " " + realToStr(p1Pos.z); 
 		ENetPacket *packet = enet_packet_create(packetData.c_str(),
 													strlen(packetData.c_str())+1,
 													ENET_PACKET_FLAG_RELIABLE);
@@ -86,7 +85,6 @@ void handleNetwork(std::string ipAddress){
 				std::string player2Packet ((char*)event.packet->data,event.packet->dataLength);
 				Ogre::Vector3 pos = packetToVect(player2Packet);
 				p2Pos = pos;
-				//app.mSceneMgr->getSceneNode("player2")->setPosition(pos);
 
 				//Destroy packet after were done
 				enet_packet_destroy(event.packet);
