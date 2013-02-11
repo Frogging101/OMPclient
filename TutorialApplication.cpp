@@ -22,8 +22,21 @@ TutorialApplication::TutorialApplication(void)
 {
 }
 //-------------------------------------------------------------------------------------
-TutorialApplication::~TutorialApplication(void)
-{
+TutorialApplication::~TutorialApplication(void){
+	ENetEvent event;
+	enet_peer_disconnect(peer,0);
+	while(enet_host_service(client, &event, 3000) > 0){
+		switch(event.type){
+			case ENET_EVENT_TYPE_RECEIVE:
+				enet_packet_destroy(event.packet);
+				break;
+			case ENET_EVENT_TYPE_DISCONNECT:
+				std::cout << "Disconnected" << std::endl;
+				break;
+		}
+	}
+
+	enet_peer_reset(peer);
 }
 
 //-------------------------------------------------------------------------------------
@@ -87,7 +100,8 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
 	bool ret = BaseApplication::frameRenderingQueued(evt);
 	if(!processUnbufferedInput(evt)) return false;
 	ENetEvent event;
-	while(enet_host_service(client, &event, 1000) > 0){
+	//ENetPacket *packet = enet_packet_create()
+	while(enet_host_service(client, &event, 0) > 0){
 		if(event.type == ENET_EVENT_TYPE_RECEIVE)
 			std::cout << "Packet Recieved, length: "
 				<< event.packet->dataLength 
@@ -98,7 +112,8 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
 			//Destroy packet after were done
 			enet_packet_destroy(event.packet);
 			break;
-		}
+	}
+	return true;
 }
 
 
@@ -162,6 +177,7 @@ extern "C" {
                 e.getFullDescription().c_str() << std::endl;
 #endif
         }
+
 
         return 0;
     }
