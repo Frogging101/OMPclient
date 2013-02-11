@@ -23,6 +23,18 @@ std::string realToStr(Ogre::Real num){
 	return ss.str();
 }
 
+Ogre::Vector3 packetToVect(std::string data){
+	std::stringstream ss;
+	ss << data;
+	//Ogre::Real x,y,z;
+	float x,y,z;
+	//ss.ignore();
+	char* bleh;
+	ss >> bleh >> x >> y >> z;
+	std::cout << x << " " << y << " " << z << std::endl;
+	return Ogre::Vector3(x,y,z);
+}
+
 //-------------------------------------------------------------------------------------
 TutorialApplication::TutorialApplication(void)
 {
@@ -121,7 +133,11 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
 				<< " on channel: " << event.channelID << std::endl;
 
 		std::string player2Packet((char*)event.packet->data, event.packet->dataLength);
-		std::cout << player2Packet << std::endl;
+		Ogre::Vector3 pos = packetToVect(player2Packet);
+		//std::cout << player2Packet << " " << pos <<  std::endl;
+		mSceneMgr->getSceneNode("player2")->setPosition(pos);
+
+
 
 			//Destroy packet after were done
 			enet_packet_destroy(event.packet);
