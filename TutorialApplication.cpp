@@ -103,6 +103,7 @@ bool TutorialApplication::processUnbufferedInput(const Ogre::FrameEvent& evt){
 }
 
 bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
+	std::string player2Packet;
 	bool ret = BaseApplication::frameRenderingQueued(evt);
 	if(!processUnbufferedInput(evt)) return false;
 	ENetEvent event;
@@ -119,6 +120,9 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
 				<< " contains: " << event.packet->data
 				<< " receieved from: " << event.peer->data
 				<< " on channel: " << event.channelID << std::endl;
+
+		player2Packet = ((char*)packet->data, packet->dataLength);
+		std::cout << player2Packet << std::endl;
 
 			//Destroy packet after were done
 			enet_packet_destroy(event.packet);
