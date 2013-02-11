@@ -121,7 +121,7 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
 				<< " receieved from: " << event.peer->data
 				<< " on channel: " << event.channelID << std::endl;
 
-		player2Packet = ((char*)packet->data, packet->dataLength);
+		std::string player2Packet ((char*)event.packet->data, event.packet->dataLength);
 		std::cout << player2Packet << std::endl;
 
 			//Destroy packet after were done
