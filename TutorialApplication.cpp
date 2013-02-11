@@ -17,6 +17,12 @@ This source file is part of the
 #include "TutorialApplication.h"
 #include <OgreSceneManager.h>
 
+std::string realToStr(Ogre::Real num){
+	std::stringstream ss;
+	ss << num;
+	return ss.str();
+}
+
 //-------------------------------------------------------------------------------------
 TutorialApplication::TutorialApplication(void)
 {
@@ -100,7 +106,12 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
 	bool ret = BaseApplication::frameRenderingQueued(evt);
 	if(!processUnbufferedInput(evt)) return false;
 	ENetEvent event;
-	//ENetPacket *packet = enet_packet_create()
+	Ogre::Vector3 pos = mSceneMgr->getSceneNode("player1")->getPosition();
+	std::string packetData = "packet " + realToStr(pos.x) + " " + realToStr(pos.y) + " " + realToStr(pos.z); 
+	ENetPacket *packet = enet_packet_create(packetData.c_str(),
+												strlen(packetData.c_str())+1,
+												ENET_PACKET_FLAG_RELIABLE);
+	enet_peer_send(peer,0,packet);
 	while(enet_host_service(client, &event, 0) > 0){
 		if(event.type == ENET_EVENT_TYPE_RECEIVE)
 			std::cout << "Packet Recieved, length: "
@@ -113,7 +124,7 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
 			enet_packet_destroy(event.packet);
 			break;
 	}
-	return true;
+	return ret;
 }
 
 
@@ -177,7 +188,6 @@ extern "C" {
                 e.getFullDescription().c_str() << std::endl;
 #endif
         }
-
 
         return 0;
     }

@@ -17,6 +17,8 @@ This source file is part of the
 #ifndef __TutorialApplication_h_
 #define __TutorialApplication_h_
 
+#include <iostream>
+#include <sstream>
 #include <enet/enet.h>
 #include "BaseApplication.h"
 
@@ -27,7 +29,6 @@ public:
     virtual ~TutorialApplication(void);
 	ENetPeer *peer;
 	ENetHost *client;
-
 
 protected:
     virtual void createScene(void);
