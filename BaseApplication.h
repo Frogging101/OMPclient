@@ -74,6 +74,7 @@ protected:
 
     Ogre::Root *mRoot;
     Ogre::Camera* mCamera;
+    Ogre::SceneManager* mSceneMgr;
     Ogre::RenderWindow* mWindow;
     Ogre::String mResourcesCfg;
     Ogre::String mPluginsCfg;
@@ -83,7 +84,6 @@ protected:
     OgreBites::SdkCameraMan* mCameraMan;       // basic camera controller
     OgreBites::ParamsPanel* mDetailsPanel;     // sample details panel
     bool mCursorWasVisible;                    // was cursor visible before dialog appeared
-    Ogre::SceneManager* mSceneMgr;
     bool mShutDown;
 
     //OIS Input devices
