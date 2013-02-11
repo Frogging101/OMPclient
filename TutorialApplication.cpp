@@ -132,6 +132,7 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
 				<< " receieved from: " << event.peer->data
 				<< " on channel: " << event.channelID << std::endl;
 
+			std::string player2Packet ((char*)event.packet->data,event.packet->dataLength);
 			Ogre::Vector3 pos = packetToVect(player2Packet);
 			//std::cout << player2Packet << " " << pos <<  std::endl;
 			mSceneMgr->getSceneNode("player2")->setPosition(pos);
