@@ -27,8 +27,6 @@ class TutorialApplication : public BaseApplication
 public:
     TutorialApplication(void);
     virtual ~TutorialApplication(void);
-	ENetPeer *peer;
-	ENetHost *client;
 
 protected:
     virtual void createScene(void);

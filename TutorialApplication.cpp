@@ -35,7 +35,7 @@ Ogre::Vector3 packetToVect(std::string data){
 	//Ogre::Real x,y,z;
 	float x,y,z;
 	//ss.ignore();
-	char* bleh;
+	std::string bleh = "";
 	ss >> bleh >> x >> y >> z;
 	std::cout << x << " " << y << " " << z << std::endl;
 	return Ogre::Vector3(x,y,z);
