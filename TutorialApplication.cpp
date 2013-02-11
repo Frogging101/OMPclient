@@ -19,6 +19,10 @@ This source file is part of the
 #include <OgreSceneManager.h>
 
 TutorialApplication app;
+std::string str_address;
+bool doShutdown = false;
+Ogre::Vector3 p1Pos;
+Ogre::Vector3 p2Pos;
 
 std::string realToStr(Ogre::Real num){
 	std::stringstream ss;
@@ -40,13 +44,12 @@ Ogre::Vector3 packetToVect(std::string data){
 
 void handleNetwork(std::string ipAddress){
 	ENetAddress address;
-	std::string str_address;
 	//setup host
-	enet_address_set_host(&address, str_address.c_str());
+	enet_address_set_host(&address, ipAddress.c_str());
 	address.port = 340;
 
 	ENetHost *client = enet_host_create(NULL,1,2,57600/8,14400/8);
-	ENetPeer *peer = enet_host_connect(app.client, &address,2,0);
+	ENetPeer *peer = enet_host_connect(client, &address,2,0);
 	ENetEvent event;
 
 	if(peer == NULL){
@@ -57,16 +60,18 @@ void handleNetwork(std::string ipAddress){
 	if(enet_host_service(client, &event,5000) > 0 &&
 			event.type == ENET_EVENT_TYPE_CONNECT){
 
-		std::cout << "Connection to " << str_address << " was succesful" << std::endl;
+		std::cout << "Connection to " << ipAddress << " was succesful" << std::endl;
 	}else {
 		enet_peer_reset(peer);
-		std::cout << "Connection to " << str_address << " failed" << std::endl;
+		std::cout << "Connection to " << ipAddress << " failed" << std::endl;
 		return;
 	}
 
-	while(!app.mShutDown){
-		Ogre::Vector3 pos = app.mSceneMgr->getSceneNode("player1")->getPosition();
-		std::string packetData = "packet " + realToStr(pos.x) + " " + realToStr(pos.y) + " " + realToStr(pos.z); 
+	//boost::this_thread::sleep(boost::posix_time::seconds(15));
+
+	while(!doShutdown){
+		//Ogre::Vector3 pos = app.mSceneMgr->getSceneNode("player1")->getPosition();
+		std::string packetData = "packet " + realToStr(p1Pos.x) + " " + realToStr(p1Pos.y) + " " + realToStr(p1Pos.z); 
 		ENetPacket *packet = enet_packet_create(packetData.c_str(),
 													strlen(packetData.c_str())+1,
 													ENET_PACKET_FLAG_RELIABLE);
@@ -81,8 +86,8 @@ void handleNetwork(std::string ipAddress){
 
 				std::string player2Packet ((char*)event.packet->data,event.packet->dataLength);
 				Ogre::Vector3 pos = packetToVect(player2Packet);
-				//std::cout << player2Packet << " " << pos <<  std::endl;
-				app.mSceneMgr->getSceneNode("player2")->setPosition(pos);
+				p2Pos = pos;
+				//app.mSceneMgr->getSceneNode("player2")->setPosition(pos);
 
 				//Destroy packet after were done
 				enet_packet_destroy(event.packet);
@@ -142,6 +147,9 @@ void TutorialApplication::createScene(void){
 	light->setDiffuseColour(Ogre::ColourValue::White);
 	light->setSpecularColour(Ogre::ColourValue::White);
 
+	boost::thread networkThread(handleNetwork,str_address);
+
+
 }
 
 bool TutorialApplication::processUnbufferedInput(const Ogre::FrameEvent& evt){
@@ -173,6 +181,9 @@ bool TutorialApplication::processUnbufferedInput(const Ogre::FrameEvent& evt){
 bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
 	bool ret = BaseApplication::frameRenderingQueued(evt);
 	if(!processUnbufferedInput(evt)) return false;
+	doShutdown = mShutDown;
+	p1Pos = mSceneMgr->getSceneNode("player1")->getPosition();
+	mSceneMgr->getSceneNode("player2")->setPosition(p2Pos);
 	return ret;
 }
 
@@ -198,10 +209,9 @@ extern "C" {
 			std::cout << "An error occured while initializing Enet" << std::endl;
 		}
 		atexit(enet_deinitialize);
-		std::string str_address;
 		std::cout << "Enter server IP: ";
 		std::cin >> str_address;
-		boost::thread networkThread(handleNetwork,str_address);
+		//boost::thread networkThread(handleNetwork,str_address);
 
         try {
             app.go();
