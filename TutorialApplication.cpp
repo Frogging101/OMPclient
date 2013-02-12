@@ -21,26 +21,59 @@ This source file is part of the
 std::string str_address;
 bool doShutdown = false;
 Ogre::Vector3 p1Pos;
-Ogre::Vector3 p2Pos;
+Ogre::Real p1yaw;
+TutorialApplication app;
+
+enum packetType {
+	pSpawn,
+	pDespawn,
+	pMove,
+	pUnknown
+};
+
+packetType strToPacketTyp(std::string type){
+	if(type == "spawn") return pSpawn;
+	else if(type == "despawn") return pDespawn;
+	else if(type == "move") return pMove;
+	else return pUnknown;
+}
 
 std::string realToStr(Ogre::Real num){
 	std::stringstream ss;
 	ss << num;
 	return ss.str();
 }
+std::string intToStr(int num){
+	std::stringstream ss;
+	ss << num;
+	return ss.str();
+}
 
-Ogre::Vector3 packetToVect(std::string data){
+void packetHandler(std::string data){
 	std::stringstream ss;
 	ss << data;
-	//Ogre::Real x,y,z;
-	float x,y,z;
-	//ss.ignore();
-	ss >> x >> y >> z;
-	std::cout << x << " " << y << " " << z << std::endl;
-	return Ogre::Vector3(x,y,z);
+	std::string type;
+	ss >> type;
+	int id;
+	float x,y,z,yaw;
+	switch(strToPacketTyp(type)){
+		case pSpawn:
+			ss >> id >> x >> y >> z >> yaw;
+			app.connectClient(id,x,y,z,yaw);
+			break;
+		case pDespawn:
+			ss >> id;
+			app.disconnectClient(id);
+			break;
+		case pMove:
+			ss >> id >> x >> y >> z >> yaw;
+			app.moveClient(id,x,y,z,yaw);
+			break;
+	}
 }
 
 void handleNetwork(std::string ipAddress){
+	std::cout << "Setting up connection" << std::endl;
 	ENetAddress address;
 	//setup host
 	enet_address_set_host(&address, ipAddress.c_str());
@@ -65,11 +98,10 @@ void handleNetwork(std::string ipAddress){
 		return;
 	}
 
-	//boost::this_thread::sleep(boost::posix_time::seconds(15));
 
 	while(!doShutdown){
-		//Ogre::Vector3 pos = app.mSceneMgr->getSceneNode("player1")->getPosition();
-		std::string packetData = realToStr(p1Pos.x) + " " + realToStr(p1Pos.y) + " " + realToStr(p1Pos.z); 
+		std::string packetData = "move " + realToStr(p1Pos.x) + " " + realToStr(p1Pos.y) + " " + 
+			realToStr(p1Pos.z) + " " + realToStr(p1yaw); 
 		ENetPacket *packet = enet_packet_create(packetData.c_str(),
 													strlen(packetData.c_str())+1,
 													ENET_PACKET_FLAG_RELIABLE);
@@ -82,9 +114,8 @@ void handleNetwork(std::string ipAddress){
 					<< " receieved from: " << event.peer->data
 					<< " on channel: " << event.channelID << std::endl;
 
-				std::string player2Packet ((char*)event.packet->data,event.packet->dataLength);
-				Ogre::Vector3 pos = packetToVect(player2Packet);
-				p2Pos = pos;
+				std::string serverPacket ((char*)event.packet->data,event.packet->dataLength);
+				packetHandler(serverPacket);
 
 				//Destroy packet after were done
 				enet_packet_destroy(event.packet);
@@ -114,6 +145,23 @@ TutorialApplication::TutorialApplication(void)
 TutorialApplication::~TutorialApplication(void){
 }
 
+void TutorialApplication::connectClient(int playerID, float x, float y, float z, float yaw){
+	Ogre::Entity *player = mSceneMgr->createEntity("player"+intToStr(playerID),"ninja.mesh");
+	Ogre::SceneNode *pnode = mSceneMgr->getRootSceneNode()->createChildSceneNode("player"+intToStr(playerID)); 
+	
+	pnode->attachObject(player);
+}
+
+void TutorialApplication::disconnectClient(int playerID){
+	mSceneMgr->destroySceneNode("player"+intToStr(playerID));
+	mSceneMgr->destroyEntity("player"+intToStr(playerID));
+}
+
+void TutorialApplication::moveClient(int playerID, float x, float y, float z, float yaw){
+	mSceneMgr->getSceneNode("player"+intToStr(playerID))->yaw(Ogre::Degree(yaw));
+	mSceneMgr->getSceneNode("player"+intToStr(playerID))->setPosition(Ogre::Vector3(x,y,z));
+}
+
 //-------------------------------------------------------------------------------------
 void TutorialApplication::createScene(void){
 
@@ -121,11 +169,8 @@ void TutorialApplication::createScene(void){
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.25,0.25,0.25));
 
 	//Create p1 entity
-	Ogre::Entity *player1 = mSceneMgr->createEntity("player1","ninja.mesh");
-	Ogre::SceneNode *p1node = mSceneMgr->getRootSceneNode()->createChildSceneNode("player1");
-
-	Ogre::Entity *player2 = mSceneMgr->createEntity("player2","robot.mesh");
-	Ogre::SceneNode *p2node = mSceneMgr->getRootSceneNode()->createChildSceneNode("player2");
+	Ogre::Entity *player1 = mSceneMgr->createEntity("me","ninja.mesh");
+	Ogre::SceneNode *p1node = mSceneMgr->getRootSceneNode()->createChildSceneNode("me");
 
 	//Create room
 	Ogre::Entity *cube = mSceneMgr->createEntity("cube","ogrehead.mesh");
@@ -133,7 +178,6 @@ void TutorialApplication::createScene(void){
 
 	//Attach nodes
 	p1node->attachObject(player1);
-	p2node->attachObject(player2);
 	cubeNode->attachObject(cube);
 
 	//Create light cause light is cool
@@ -169,7 +213,7 @@ bool TutorialApplication::processUnbufferedInput(const Ogre::FrameEvent& evt){
 		transVector.x += mMove;
 	}
 
-	mSceneMgr->getSceneNode("player1")->translate(transVector * evt.timeSinceLastFrame, Ogre::Node::TS_LOCAL);
+	mSceneMgr->getSceneNode("me")->translate(transVector * evt.timeSinceLastFrame, Ogre::Node::TS_LOCAL);
 
 	return true;
 }
@@ -178,8 +222,9 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
 	bool ret = BaseApplication::frameRenderingQueued(evt);
 	if(!processUnbufferedInput(evt)) return false;
 	doShutdown = mShutDown;
-	p1Pos = mSceneMgr->getSceneNode("player1")->getPosition();
-	mSceneMgr->getSceneNode("player2")->setPosition(p2Pos);
+	p1Pos = mSceneMgr->getSceneNode("me")->getPosition();
+	p1yaw = mSceneMgr->getSceneNode("me")->getOrientation().getYaw().valueDegrees();
+	//mSceneMgr->getSceneNode("player2")->setPosition(p2Pos);
 	return ret;
 }
 
@@ -208,7 +253,7 @@ extern "C" {
 		std::cout << "Enter server IP: ";
 		std::cin >> str_address;
 
-		TutorialApplication app;
+		//TutorialApplication app;
 
 
         try {

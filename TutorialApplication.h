@@ -27,6 +27,9 @@ class TutorialApplication : public BaseApplication
 public:
     TutorialApplication(void);
     virtual ~TutorialApplication(void);
+	void connectClient(int playerID,float x, float y, float z, float yaw);
+	void disconnectClient(int playerID);
+	void moveClient(int playerID,float x, float y, float z, float yaw);
 
 protected:
     virtual void createScene(void);
