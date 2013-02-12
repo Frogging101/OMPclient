@@ -207,10 +207,12 @@ bool TutorialApplication::processUnbufferedInput(const Ogre::FrameEvent& evt){
 		transVector.z += mMove;
 	}
 	if(mKeyboard->isKeyDown(OIS::KC_J)){
-		transVector.x -= mMove;
+		//transVector.x -= mMove;
+		mSceneMgr->getSceneNode("me")->yaw(Ogre::Degree(mRotate));
 	}
 	if(mKeyboard->isKeyDown(OIS::KC_L)){
-		transVector.x += mMove;
+		//transVector.x += mMove;
+		mSceneMgr->getSceneNode("me")->yaw(Ogre::Degree(-mRotate));
 	}
 
 	mSceneMgr->getSceneNode("me")->translate(transVector * evt.timeSinceLastFrame, Ogre::Node::TS_LOCAL);
