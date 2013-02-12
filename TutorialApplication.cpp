@@ -77,7 +77,7 @@ void handleNetwork(std::string ipAddress){
 	ENetAddress address;
 	//setup host
 	enet_address_set_host(&address, ipAddress.c_str());
-	address.port = 340;
+	address.port = 1255;
 
 	ENetHost *client = enet_host_create(NULL,1,2,57600/8,14400/8);
 	ENetPeer *peer = enet_host_connect(client, &address,2,0);
