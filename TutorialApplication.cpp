@@ -195,7 +195,7 @@ void TutorialApplication::createScene(void){
 bool TutorialApplication::processUnbufferedInput(const Ogre::FrameEvent& evt){
 	static bool mMouseDown = false;
 	static Ogre::Real mToggle = 0.0;
-	static Ogre::Real mRotate = 0.13;
+	static Ogre::Real mRotate = 150;
 	static Ogre::Real mMove = 250;
 
 	Ogre::Vector3 transVector = Ogre::Vector3::ZERO;
@@ -208,11 +208,11 @@ bool TutorialApplication::processUnbufferedInput(const Ogre::FrameEvent& evt){
 	}
 	if(mKeyboard->isKeyDown(OIS::KC_J)){
 		//transVector.x -= mMove;
-		mSceneMgr->getSceneNode("me")->yaw(Ogre::Degree(mRotate));
+		mSceneMgr->getSceneNode("me")->yaw(Ogre::Degree(mRotate * evt.timeSinceLastFrame));
 	}
 	if(mKeyboard->isKeyDown(OIS::KC_L)){
 		//transVector.x += mMove;
-		mSceneMgr->getSceneNode("me")->yaw(Ogre::Degree(-mRotate));
+		mSceneMgr->getSceneNode("me")->yaw(Ogre::Degree(-mRotate * evt.timeSinceLastFrame));
 	}
 
 	mSceneMgr->getSceneNode("me")->translate(transVector * evt.timeSinceLastFrame, Ogre::Node::TS_LOCAL);
