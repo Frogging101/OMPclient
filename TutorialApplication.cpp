@@ -21,7 +21,9 @@ This source file is part of the
 std::string str_address;
 bool doShutdown = false;
 Ogre::Vector3 p1Pos;
-Ogre::Real p1yaw;
+Ogre::Real p1Yaw;
+Ogre::Vector3 p1OldPos;
+Ogre::Real p1OldYaw;
 TutorialApplication app;
 
 enum packetType {
@@ -100,12 +102,16 @@ void handleNetwork(std::string ipAddress){
 
 
 	while(!doShutdown){
-		std::string packetData = "move " + realToStr(p1Pos.x) + " " + realToStr(p1Pos.y) + " " + 
-			realToStr(p1Pos.z) + " " + realToStr(p1yaw); 
-		ENetPacket *packet = enet_packet_create(packetData.c_str(),
-													strlen(packetData.c_str())+1,
-													ENET_PACKET_FLAG_RELIABLE);
-		enet_peer_send(peer,0,packet);
+		if(p1Pos != p1OldPos && p1OldYaw != p1Yaw){
+			std::string packetData = "move " + realToStr(p1Pos.x) + " " + realToStr(p1Pos.y) + " " + 
+				realToStr(p1Pos.z) + " " + realToStr(p1Yaw); 
+			ENetPacket *packet = enet_packet_create(packetData.c_str(),
+														strlen(packetData.c_str())+1,
+														ENET_PACKET_FLAG_RELIABLE);
+			enet_peer_send(peer,0,packet);
+		}
+		p1OldPos = p1Pos;
+		p1OldYaw = p1Yaw;
 		while(enet_host_service(client, &event, 100) > 0){
 			if(event.type == ENET_EVENT_TYPE_RECEIVE)
 				std::cout << "Packet Recieved, length: "
@@ -160,7 +166,8 @@ void TutorialApplication::disconnectClient(int playerID){
 
 void TutorialApplication::moveClient(int playerID, float x, float y, float z, float yaw){
 	std::cout << "moving " << playerID << std::endl;
-	mSceneMgr->getSceneNode("player"+intToStr(playerID))->yaw(Ogre::Degree(yaw));
+	//mSceneMgr->getSceneNode("player"+intToStr(playerID))->yaw(Ogre::Degree(yaw));
+	mSceneMgr->getSceneNode("player"+intToStr(playerID))->setOrientation(0,0,yaw,0);
 	mSceneMgr->getSceneNode("player"+intToStr(playerID))->setPosition(Ogre::Vector3(x,y,z));
 }
 
@@ -227,7 +234,7 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt){
 	if(!processUnbufferedInput(evt)) return false;
 	doShutdown = mShutDown;
 	p1Pos = mSceneMgr->getSceneNode("me")->getPosition();
-	p1yaw = mSceneMgr->getSceneNode("me")->getOrientation().getYaw().valueDegrees();
+	p1Yaw = mSceneMgr->getSceneNode("me")->getOrientation().getYaw().valueDegrees();
 	//mSceneMgr->getSceneNode("player2")->setPosition(p2Pos);
 	return ret;
 }
