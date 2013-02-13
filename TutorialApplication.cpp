@@ -179,6 +179,7 @@ void TutorialApplication::createScene(void){
 
 	//Set scene ambient lighting
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.25,0.25,0.25));
+	mCamera->setNearClipDistance(0.1);
 
 	//Create p1 entity
 	Ogre::Entity *player1 = mSceneMgr->createEntity("me","ninja.mesh");
