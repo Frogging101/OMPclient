@@ -146,6 +146,7 @@ TutorialApplication::~TutorialApplication(void){
 }
 
 void TutorialApplication::connectClient(int playerID, float x, float y, float z, float yaw){
+	std::cout << playerID << " connected" << std::endl;
 	Ogre::Entity *player = mSceneMgr->createEntity("player"+intToStr(playerID),"ninja.mesh");
 	Ogre::SceneNode *pnode = mSceneMgr->getRootSceneNode()->createChildSceneNode("player"+intToStr(playerID)); 
 	
@@ -158,6 +159,7 @@ void TutorialApplication::disconnectClient(int playerID){
 }
 
 void TutorialApplication::moveClient(int playerID, float x, float y, float z, float yaw){
+	std::cout << "moving " << playerID << std::endl;
 	mSceneMgr->getSceneNode("player"+intToStr(playerID))->yaw(Ogre::Degree(yaw));
 	mSceneMgr->getSceneNode("player"+intToStr(playerID))->setPosition(Ogre::Vector3(x,y,z));
 }
