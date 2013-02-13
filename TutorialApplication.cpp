@@ -102,7 +102,7 @@ void handleNetwork(std::string ipAddress){
 
 
 	while(!doShutdown){
-		if(p1Pos != p1OldPos && p1OldYaw != p1Yaw){
+		if(p1Pos != p1OldPos || p1OldYaw != p1Yaw){
 			std::string packetData = "move " + realToStr(p1Pos.x) + " " + realToStr(p1Pos.y) + " " + 
 				realToStr(p1Pos.z) + " " + realToStr(p1Yaw); 
 			ENetPacket *packet = enet_packet_create(packetData.c_str(),
@@ -112,7 +112,7 @@ void handleNetwork(std::string ipAddress){
 		}
 		p1OldPos = p1Pos;
 		p1OldYaw = p1Yaw;
-		while(enet_host_service(client, &event, 100) > 0){
+		while(enet_host_service(client, &event, 33) > 0){
 			if(event.type == ENET_EVENT_TYPE_RECEIVE)
 				std::cout << "Packet Recieved, length: "
 					<< event.packet->dataLength 
